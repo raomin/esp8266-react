@@ -29,8 +29,15 @@ void SystemStatus::systemStatus(AsyncWebServerRequest* request) {
   root["sdk_version"] = ESP.getSdkVersion();
   root["flash_chip_size"] = ESP.getFlashChipSize();
   root["flash_chip_speed"] = ESP.getFlashChipSpeed();
+#ifdef ESP32
   root["spiffs_used"] = SPIFFS.usedBytes();
   root["spiffs_size"] = SPIFFS.totalBytes();
+#elif defined(ESP8266)
+  FSInfo fs_info;
+  SPIFFS.info(fs_info);
+  root["spiffs_used"] = fs_info.usedBytes;
+  root["spiffs_size"] = fs_info.totalBytes;
+#endif
   response->setLength();
   request->send(response);
 }
